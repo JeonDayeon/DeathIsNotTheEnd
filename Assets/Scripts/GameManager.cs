@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
                 GameObject clicks = hit.transform.gameObject;
                 Debug.Log(clicks.name);
                 InteractDirObject InteractObj = clicks.GetComponent<InteractDirObject>();
-                if(InteractObj != null)
+                if (InteractObj != null)
                 {
                     for (int i = 0; i < DirObjectBtns.transform.childCount; i++)
                     {
@@ -57,6 +57,13 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public void AddUseObj(string NewObj)
+    {
+        if(!UseObj.Contains(NewObj))
+            UseObj.Add(NewObj);
+    }
+
     public void ResultInteractBox()
     {
         InteractionObjTmp.text = "다음 상황에서 나는 어떻게 행동할까?";
@@ -111,7 +118,15 @@ public class GameManager : MonoBehaviour
                         DirObjectBtn.gameObject.SetActive(true);
                         DirObjectBtn.GetComponentInChildren<TextMeshProUGUI>().text = (i + 1) + ". " + InteractObj.InteractOptions[i].DirText;
 
-                        DirObjectBtn.transform.GetComponent<SelectInteractBtn>().SetInteractResult(InteractObj.InteractOptions[i].InteractResult.isResult,InteractObj.InteractOptions[i].InteractResult.Chat,InteractObj.InteractOptions[i].InteractResult.Item,InteractObj.InteractOptions[i].InteractResult.Result,InteractObj.InteractOptions[i].InteractResult.Type);
+                        DirObjectBtn.transform.GetComponent<SelectInteractBtn>().SetInteractResult(InteractObj.InteractOptions[i].InteractResult.isResult, InteractObj.InteractOptions[i].InteractResult.Chat, InteractObj.InteractOptions[i].InteractResult.Item, InteractObj.InteractOptions[i].InteractResult.Result, InteractObj.InteractOptions[i].InteractResult.Type);
+                        if (UseObj.Contains(InteractObj.InteractOptions[i].InteractResult.Item) || UseObj.Count > 1 && InteractObj.InteractOptions[i].InteractResult.Type == InteractResult.ResultType.EquipInHand)
+                        {
+                            DirObjectBtn.interactable = false;
+                        }
+                        else
+                        {
+                            DirObjectBtn.interactable = true;
+                        }
                     }
                 }
             }
