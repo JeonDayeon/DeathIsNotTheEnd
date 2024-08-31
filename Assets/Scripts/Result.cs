@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
+using UnityEngine.SceneManagement;
 
 public class Result : MonoBehaviour
 {
@@ -14,21 +14,24 @@ public class Result : MonoBehaviour
     public GameObject[] resultBg3;
     public GameObject character;
     public GameObject resultTexts;
-    public TextMeshPro[] resultText;
+    public GameObject[] resultText;
 
     public string[] cImgPath = new string[10];
     public Sprite[] cImg = new Sprite[8];
 
+    public GameObject ResultCanvas;
+
+    public Button Retry;
     //public Image cimage;
 
     // Start is called before the first frame update
     void Start()
     {
+        Retry.onClick.AddListener(NextChapter);
         result = 0;
         chapter = 0;
         resultBg2 = new GameObject[3];
         resultBg3 = new GameObject[3];
-        resultText = new TextMeshPro[3];
 
         cImgPath = new string[10];
         cImg = new Sprite[7];
@@ -47,15 +50,15 @@ public class Result : MonoBehaviour
         }
 
         character = GameObject.Find("character");
-        
-        resultUI(chapter, result);
+
+        ResultCanvas = GameObject.Find("ResultCanvas");
+
+        ResultCanvas.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        resultUI(chapter, result);
-        resultUICharacter(chapter, result);
     }
 
     void resultUICharacter(int chapter, int result)
@@ -89,9 +92,17 @@ public class Result : MonoBehaviour
 
     }
 
-    void resultUI(int chapter, int result)
+    public void resultUI(int chapter, int result, List<string> InteractResultAll)
     {
+        ResultCanvas.SetActive(true);
+        resultText = new GameObject[InteractResultAll.Count];
 
+        for (int i = 0; i < InteractResultAll.Count; i++)
+        {
+            resultText[i] = resultTexts.transform.GetChild(i).gameObject;
+            resultText[i].GetComponent<TextMeshProUGUI>().text = InteractResultAll[i];
+        }
+        
         if (chapter == 0)
         {
             if (result == 0)
@@ -180,5 +191,11 @@ public class Result : MonoBehaviour
                 resultBg3[2].SetActive(false);
             }
         }
+        resultUICharacter(chapter, result);
+    }
+
+    public void NextChapter()
+    {
+        SceneManager.LoadScene(0);
     }
 }

@@ -6,6 +6,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public int Chapter = 0;
     public GameObject InteractionBox;
     public TextMeshProUGUI InteractionObjTmp;
     public TextMeshProUGUI InteractionAll;
@@ -13,7 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject DirObjBtnsBG;
 
     public List<string> UseObj = new List<string>(2);
-    public List<string> InteractionResultAll = new List<string>();
+    public List<string> InteractionResultAll = new List<string>(1);
 
     // Start is called before the first frame update
     void Start()
@@ -64,7 +65,7 @@ public class GameManager : MonoBehaviour
             UseObj.Add(NewObj);
     }
 
-    public void ResultInteractBox()
+    public void ResultInteractBox(bool isEnding)
     {
         InteractionObjTmp.text = "다음 상황에서 나는 어떻게 행동할까?";
         for (int i = 0; i < DirObjectBtns.transform.childCount; i++)
@@ -75,9 +76,14 @@ public class GameManager : MonoBehaviour
             DirObjectBtnBG.gameObject.SetActive(false);
         }
 
+        
         InteractionAll.gameObject.SetActive(true);
-        for (int i = 0; i < InteractionResultAll.Count; i++)
-            InteractionAll.text = InteractionResultAll[i] + "\n";
+        if (isEnding || InteractionResultAll.Count <= 0)
+            InteractionAll.text = InteractionResultAll[0];
+        else
+        {
+            InteractionAll.text = InteractionResultAll[InteractionResultAll.Count - 1];
+        }
     }
     public void SetInteractBox(InteractDirObject InteractObj)
     {
@@ -111,6 +117,17 @@ public class GameManager : MonoBehaviour
                             DirObjectBtn.GetComponentInChildren<TextMeshProUGUI>().text = (i + 1) + ". " + InteractObj.InteractOptions[i].DirText;
 
                             DirObjectBtn.transform.GetComponent<SelectInteractBtn>().SetInteractResult(InteractObj.InteractOptions[i].InteractResult.isResult, InteractObj.InteractOptions[i].InteractResult.Chat, InteractObj.InteractOptions[i].InteractResult.Item, InteractObj.InteractOptions[i].InteractResult.Result, InteractObj.InteractOptions[i].InteractResult.Type);
+                            if (UseObj.Contains(InteractObj.InteractOptions[i].InteractResult.Item) || UseObj.Count > 1 && InteractObj.InteractOptions[i].InteractResult.Type == InteractResult.ResultType.EquipInHand)
+                            {
+                                DirObjectBtn.interactable = false;
+                            }
+                            else
+                            {
+                                DirObjectBtn.interactable = true;
+                            }
+
+                            DirObjectBtn.transform.GetComponent<SelectInteractBtn>().isEnding = InteractObj.InteractOptions[i].isEnding;
+                            DirObjectBtn.transform.GetComponent<SelectInteractBtn>().EndingNumber = InteractObj.InteractOptions[i].EndingNumber;
                         }
                     }
                     else
@@ -127,6 +144,9 @@ public class GameManager : MonoBehaviour
                         {
                             DirObjectBtn.interactable = true;
                         }
+
+                        DirObjectBtn.transform.GetComponent<SelectInteractBtn>().isEnding = InteractObj.InteractOptions[i].isEnding;
+                        DirObjectBtn.transform.GetComponent<SelectInteractBtn>().EndingNumber = InteractObj.InteractOptions[i].EndingNumber;
                     }
                 }
             }
